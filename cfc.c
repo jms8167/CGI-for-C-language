@@ -8,14 +8,23 @@
 char src[65536];
 char compile[512];
 char name[512],out[512];
-char* path="/usr/bin/cfcf/";
+char* path="/var/www/cgi-bin/";
 int main(int argc,char* argv[]){
+	
+	srand(time(0));
 	if(argc!=2){
 		puts("Usage : [C source]");
 		exit(EXIT_FAILURE);
 	}
+	char s[65536]={0};
+	int i=0;
+	scanf("%s",s);
+	char param[512];
+	sprintf(param,"%sparam%d",path,rand());
+	FILE* pp=fopen(param,"w");
+	fprintf(pp,"%s",s);
+	fclose(pp);
 	int len= strlen(path);
-	srand(time(0));
 	int r = rand();
 	sprintf(name,"%sdst%d.c",path,r);
 	sprintf(out,"%sout%d",path,rand());
@@ -34,14 +43,21 @@ int main(int argc,char* argv[]){
 	//#gcc -o %s %s
 	sprintf(cmd,compile+1,out,name);
 	system(cmd);
-	chdir(path);
-	sprintf(cmd,"./%s",out+len);
+	char curpath[512];
+//	fprintf(stderr,"currpath : %s\n",getcwd(curpath,511));
+//	fprintf(stderr,"gcc option : %s\n",cmd);
+//	chdir(path);
+	
+//	fprintf(stderr,"movepath : %s\n",getcwd(curpath,511));
+	sprintf(cmd,"./%s < %s",out+len,param);
 	system(cmd);
 	
 	sprintf(cmd,"rm %s",out+len);
 	system(cmd);
 	sprintf(cmd,"rm %s",name+len);
 	system(cmd);	
+	sprintf(cmd,"rm %s",param+len);
+	system(cmd);
 	return 0;	
 }
 /* Cfc usage
